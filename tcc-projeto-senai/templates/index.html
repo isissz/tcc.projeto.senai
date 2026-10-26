@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="icon" type="image/png" href="static/iconecaixa.png">
+    <title>Login Página</title>
+</head>
+
+<body>
+
+    <div class="container" id="container">
+        <div class="form-container sign-up">
+            <form action="/cadastro"> <h1>Administrador</h1>
+                <input type="text" placeholder="Usuário"> <input type="password" placeholder="Senha"> <button type="submit">Entrar como adm</button> </form>
+        </div>
+
+        <div class="form-container sign-in">
+            <form action="/home">
+                <h1>Entrar</h1>
+                <input type="text" placeholder="Usuário"> <input type="password" placeholder="Senha"> <button type="submit">Entrar</button>
+            </form>
+        </div>
+
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Sou um usuário!</h1>
+                    <p>Entre em sua conta como um usuário!</p>
+                    <button class="hidden" id="login">Sou usuário</button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Sou um administrador!</h1>
+                    <p>Entre em sua conta como um adm!</p>
+                    <button class="hidden" id="register">Clique aqui</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/script.js"></script>
+</body>
+</html>

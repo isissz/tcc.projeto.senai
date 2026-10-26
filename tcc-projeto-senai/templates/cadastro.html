@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Item - SENAI</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="static/iconecaixa.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="static/cadastro.css">
+</head>
+
+<body>
+    <div class="barra-topo">
+        <nav id="navlateral" class="navbar navbar-light">
+            <div class="container-fluid p-0">
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel" style="left: 0px;">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu de Navegação</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
+                            <li class="login-user-name-1">
+                                <a class="nav-link active" aria-current="page" href="/">
+                                    <img src="static/login-user-name-1.png" alt="Login Icon" class="me-2" style="width: 16px; height: 16px; object-fit: contain;">Login
+                                </a> 
+                                <li class="List">
+                                    <a class="nav-link active" aria-current="page" href="/home">
+                                        <img src="static/List.png" alt="Login Icon" class="me-2" style="width: 16px; height: 16px; object-fit: contain;">Lista de Materiais
+                                    </a> 
+                            <li class="nav-item mb-2">
+                                <a class="nav-link active" aria-current="page" href="/cadastro">
+                                    <i class="fa-solid fa-box-open me-2"></i>Cadastro de Item
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link" href="/move">
+                                    <i class="fa-solid fa-right-left me-2"></i>Movimentação de Estoque
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    
+        <img src="static/senaioficial.png" style="width: 180px; height: auto; margin-left: 5px;">
+    </div>
+
+<div class="main-wrapper">
+    <div class="container-formulario">
+
+            <div class="text-center mb-4">
+                <img src="static/senaioficial.png" width="350" height="85" alt="Logo SENAI">
+            </div>
+        <form action="http://localhost:3000/cadastrar-item" method="POST">
+
+            <h3 style="color:#002A54; text-align:center; font-weight:700; margin-bottom:25px;">
+                CADASTRO DE ITEM
+            </h3>
+
+            <form action="/confirmar.html" method="POST">
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="fa-solid fa-tag me-2"></i>Nome</span>
+                    <input type="text" class="form-control" placeholder="Nome do item" name="nome" required>
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="fa-solid fa-list-ol me-2"></i>Qtde</span>
+                    <input type="number" class="form-control" placeholder="Qtde em estoque" name="qtde" min="0" required>
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="fa-solid fa-layer-group me-2"></i>Categoria</span>
+                    <input type="text" class="form-control" placeholder="Categoria" name="categoria" required>
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="fa-solid fa-dollar-sign me-2"></i>Preço</span>
+                    <input type="text" class="form-control" placeholder="Preço" name="preco" required>
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="fa-solid fa-triangle-exclamation me-2"></i>Est. Mínimo</span>
+                    <input type="number" class="form-control" placeholder="Estoque Mínimo" name="estoque_min" min="0" required>
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="fa-solid fa-image me-2"></i>Foto</span>
+                    <input type="text" class="form-control" placeholder="Caminho da foto" name="foto">
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="fa-solid fa-font me-2"></i>Descrição</span>
+                    <input type="text" class="form-control" placeholder="Descrição do item" name="descricao">
+                </div>
+
+                <button type="submit" class="btn-enviar mt-3">
+                    Adicionar no banco de dados
+                </button>
+            </form>
+        </form>
+    </div>
+ </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

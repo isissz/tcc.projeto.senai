@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Almoxarifado - Lista de Materiais</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <link rel="stylesheet" href="static/style2.css">
+    <link rel="icon" type="image/png" href="static/iconecaixa.png">
+    
+    <style>
+        h2 { 
+            text-align: center; 
+            margin-bottom: 25px;
+            color: #334155; /* Mesmo cinza escuro dos labels do formulário */
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Container idêntico ao .container-formulario */
+        .container-tabela {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 850px; 
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        /* Cabeçalho da tabela limpo, combinando com o padrão de inputs */
+        .custom-header {
+            background-color: #f8fafc !important; /* Mesmo fundo cinza claro do .input-group-text */
+            border-bottom: 2px solid #cbd5e1 !important;
+        }
+        
+        .custom-header th {
+            background-color: #f8fafc !important;
+            color: #334155 !important; /* Texto escuro e limpo */
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            padding: 14px;
+            border-bottom: 2px solid #cbd5e1 !important;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            padding: 12px 14px;
+            color: #334155;
+            font-size: 14px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* Badge de quantidade cinza sutil para não contrastar com azul */
+        .badge-qtd {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="barra-topo"> 
+        <nav id="navlateral" class="navbar navbar-light">
+            <div class="container-fluid p-0">
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu de Navegação</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
+                            <li class="nav-item mb-2">
+                                <a class="nav-link" href="/">
+                                    <img src="static/login-user-name-1.png" alt="Login Icon" class="me-2" style="width: 16px; height: 16px; object-fit: contain;">Login
+                                </a> 
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/home">
+                                    <img src="static/List.png" alt="List Icon" class="me-2" style="width: 16px; height: 16px; object-fit: contain;">Lista de Materiais
+                                </a> 
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <img src="static/senaioficial.png" alt="Logo">
+    </div>
+
+    <main class="main-wrapper">
+        <div class="container-tabela">
+            
+            <h2>Lista de Materiais do Almoxarifado</h2>
+
+            <div class="table-responsive">
+                <table class="table table-hover m-0">
+                    <thead class="custom-header">
+                        <tr>
+                            <th scope="col" style="width: 10%;">ID</th>
+                            <th scope="col" style="width: 45%;">Nome</th>
+                            <th scope="col" style="width: 15%;">Qtd</th>
+                            <th scope="col" style="width: 30%;">Descrição</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for produto in produtos %}
+                        <tr>
+                            <th scope="row" style="font-weight: 600;">{{ produto[0] }}</th>
+                            <td>{{ produto[1] }}</td>
+                            <td><span class="badge-qtd">{{ produto[2] }}</span></td>
+                            <td>{{ produto[3] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="static/script.js"></script>
+</body>
+</html>
