@@ -1,0 +1,10 @@
+Rota Principal 
+GET http://10.154.20.99:5000
+retorna API Rodando
+
+
+
+Testar a rota produtos
+METODO GET
+http://10.154.20.99:5000/api/produtos
+

@@ -1,0 +1,25 @@
+services: 
+  api: 
+    build: . 
+    ports: 
+      - "5000:5000" 
+    depends_on: 
+      db:
+        condition: service_healthy
+  db: 
+    image: mysql:8.0 
+    environment: 
+      MYSQL_DATABASE: senai 
+      MYSQL_ROOT_PASSWORD: "mysql_root" 
+    ports: 
+      - "3306:3306" 
+    volumes:
+      - type: bind
+        source: ./script.sql
+        target: /docker-entrypoint-initdb.d/script.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pmysql_root"]
+      interval: 5s     # Testa a cada 5 segundos
+      timeout: 5s      # Tempo limite de cada teste
+      retries: 5       # Tenta 5 vezes antes de marcar como "unhealthy"
+      start_period: 60s # Aguarda 40s antes de começar os testes (tempo inicial de boot)
