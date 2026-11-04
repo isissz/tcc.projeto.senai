@@ -12,9 +12,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const API_URL = "http://10.154.20.173:5000/api/produtos";
-// Base da URL caso sua API retorne apenas o caminho relativo da imagem (ex: "uploads/foto.jpg")
-const BASE_URL_IMAGEM = "http://10.154.20.173:5000";
+const API_URL = "http://10.154.20.141:5000/api/produtos";
+const BASE_URL_IMAGEM = "http://10.154.20.141:5000/api/produtos";
 
 export default function Home({ navigation }) {
   const [produtos, setProdutos] = useState([]); 
@@ -24,12 +23,14 @@ export default function Home({ navigation }) {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [imagemSelecionada, setImagemSelecionada] = useState(null);
 
+  // Estado para controlar a abertura/fechamento do Menu Lateral
+  const [menuVisivel, setMenuVisivel] = useState(false);
+
   const buscarProdutos = async () => {
     setLoading(true);
     try {
       const response = await fetch(API_URL, { method: 'GET' });
       const responseText = await response.text();
-      console.log("Resposta Bruta da API de Produtos:", responseText);
 
       if (response.ok) {
         const data = JSON.parse(responseText);
@@ -49,19 +50,12 @@ export default function Home({ navigation }) {
     buscarProdutos();
   }, []);
 
-  // Trata a URL da imagem vinda do banco de dados
   const obterUriImagem = (item) => {
-    // Substitua 'item.imagem' pelo nome da sua coluna de imagem no banco (ex: item.foto, item.url_imagem, item.imagem_base64)
     const campoImagem = item.imagem || item.foto || item.url_imagem;
-
     if (!campoImagem) return null;
-
-    // Se já for uma imagem em Base64 ou uma URL completa do tipo http://...
     if (campoImagem.startsWith('data:') || campoImagem.startsWith('http')) {
       return { uri: campoImagem };
     }
-
-    // Se a API retornar apenas o caminho (ex: "/uploads/produto1.png"), concatena com o IP do servidor
     return { uri: `${BASE_URL_IMAGEM}${campoImagem.startsWith('/') ? '' : '/'}${campoImagem}` };
   };
 
@@ -77,56 +71,106 @@ export default function Home({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitulo}>Painel de Produtos</Text>
-        <TouchableOpacity style={styles.botaoSair} onPress={() => navigation.navigate('Index')}>
-          <Text style={styles.textoBotaoSair}>Sair</Text>
+      {/* BARRA DO TOPO */}
+      <View style={styles.barraTopo}>
+        <TouchableOpacity style={styles.botaoToggler} onPress={() => setMenuVisivel(true)}>
+          <View style={styles.hamburgerLinha} />
+          <View style={styles.hamburgerLinha} />
+          <View style={styles.hamburgerLinha} />
         </TouchableOpacity>
+        
+        <Image 
+          source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/8/8c/Logo_Senai.svg' }}
+          style={styles.logoTopo}
+          resizeMode="contain"
+        />
       </View>
 
-      <Text style={styles.subtitulo}>Produtos retornados pela API (Clique para abrir a imagem):</Text>
+      <View style={styles.mainWrapper}>
+        <View style={styles.containerTabela}>
+          <Text style={styles.tituloTabela}>LISTA DE MATERIAIS DO ALMOXARIFADO</Text>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#192a6b" style={{ flex: 1 }} />
-      ) : (
-        <FlatList
-          data={produtos}
-          keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
-          refreshing={loading}
-          onRefresh={buscarProdutos}
-          renderItem={({ item }) => {
-            const fonteImagem = obterUriImagem(item);
-            return (
-              <TouchableOpacity 
-                style={styles.cardProduto} 
-                onPress={() => lidarComCliqueProduto(item)}
-                activeOpacity={0.7}
-              >
-                <View style={styles.conteudoCard}>
-                  {/* Miniatura da imagem à esquerda */}
-                  {fonteImagem ? (
-                    <Image source={fonteImagem} style={styles.miniatura} />
-                  ) : (
-                    <View style={[styles.miniatura, styles.miniaturaSemFoto]}>
-                      <Text style={styles.textoSemFoto}>🖼️</Text>
+          {loading ? (
+            <ActivityIndicator size="large" color="#002A54" style={{ flex: 1, marginVertical: 40 }} />
+          ) : (
+            <FlatList
+              data={produtos}
+              keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
+              refreshing={loading}
+              onRefresh={buscarProdutos}
+              renderItem={({ item }) => {
+                return (
+                  <View style={styles.produtoRow}>
+                    <Text style={styles.produtoId}>{item.id}</Text>
+                    <View style={styles.produtoFotoContainer}>
+                      <TouchableOpacity style={styles.btnVisualizar} onPress={() => lidarComCliqueProduto(item)}>
+                        <Text style={styles.btnVisualizarTexto}>Visualizar</Text>
+                      </TouchableOpacity>
                     </View>
-                  )}
-
-                  <View style={styles.infoProduto}>
-                    <Text style={styles.nomeProduto}>📦 {item.nome || item.nome_produto || "Produto sem Nome"}</Text>
-                    <Text style={styles.detalhesProduto}>
-                      ID: {item.id} {item.preco ? `| Preço: R$ ${item.preco}` : ''}
-                    </Text>
+                    <Text style={styles.produtoNome} numberOfLines={1}>{item.nome || item.nome_produto}</Text>
+                    <View style={styles.badgeQtd}>
+                      <Text style={styles.badgeQtdTexto}>{item.quantidade || item.qtd || 0}</Text>
+                    </View>
                   </View>
-                </View>
+                );
+              }}
+              ListEmptyComponent={
+                <Text style={styles.listaVazia}>Nenhum produto listado. Puxe para baixo para recarregar.</Text>
+              }
+            />
+          )}
+        </View>
+      </View>
+
+      {/* MENU LATERAL / OFF-CANVAS */}
+      <Modal
+        visible={menuVisivel}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setMenuVisivel(false)}
+      >
+        <View style={styles.offcanvasOverlay}>
+          <View style={styles.offcanvasContainer}>
+            <View style={styles.offcanvasHeader}>
+              <Text style={styles.offcanvasTitle}>Menu de Navegação</Text>
+              <TouchableOpacity onPress={() => setMenuVisivel(false)}>
+                <Text style={styles.btnClose}>✕</Text>
               </TouchableOpacity>
-            );
-          }}
-          ListEmptyComponent={
-            <Text style={styles.listaVazia}>Nenhum produto listado. Puxe para baixo para recarregar.</Text>
-          }
-        />
-      )}
+            </View>
+
+            <View style={styles.offcanvasBody}>
+              {/* Opção Login (Direciona para a primeira página 'Index') */}
+              <TouchableOpacity 
+                style={styles.navItem} 
+                onPress={() => { setMenuVisivel(false); navigation.navigate('Login'); }}
+              >
+                <Text style={styles.navText}>Login</Text>
+              </TouchableOpacity>
+
+              {/* Opção Cadastro (Direciona para a tela 'Cadastro') */}
+              <TouchableOpacity 
+                style={styles.navItem} 
+                onPress={() => { setMenuVisivel(false); navigation.navigate('Cadastro'); }}
+              >
+                <Text style={styles.navText}>Cadastro de Perfil</Text>
+              </TouchableOpacity>
+
+              {/* Opção Lista de Materiais (Ativa na tela atual) */}
+              <TouchableOpacity 
+                style={[styles.navItem, styles.navItemActive]} 
+                onPress={() => setMenuVisivel(false)}
+              >
+                <Text style={[styles.navText, styles.navTextActive]}>Lista de Materiais</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <TouchableOpacity 
+            style={styles.offcanvasBackdropTouch} 
+            activeOpacity={1} 
+            onPress={() => setMenuVisivel(false)} 
+          />
+        </View>
+      </Modal>
 
       {/* Modal para Visualização da Imagem Ampliada */}
       <Modal
@@ -163,27 +207,156 @@ export default function Home({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f4f6f9', padding: 20 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  headerTitulo: { fontSize: 22, fontWeight: 'bold', color: '#192a6b' },
-  botaoSair: { backgroundColor: '#dc3545', paddingVertical: 6, paddingHorizontal: 15, borderRadius: 6 },
-  textoBotaoSair: { color: '#fff', fontWeight: 'bold', fontSize: 13 },
-  subtitulo: { fontSize: 14, color: '#666', marginBottom: 15, fontWeight: '600' },
-  cardProduto: { backgroundColor: '#fff', padding: 12, borderRadius: 10, marginBottom: 10, elevation: 2 },
-  conteudoCard: { flexDirection: 'row', alignItems: 'center' },
-  miniatura: { width: 50, height: 50, borderRadius: 8, marginRight: 15, backgroundColor: '#eee' },
-  miniaturaSemFoto: { justifyContent: 'center', alignItems: 'center' },
-  textoSemFoto: { fontSize: 18 },
-  infoProduto: { flex: 1 },
-  nomeProduto: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-  detalhesProduto: { fontSize: 12, color: '#777', marginTop: 4 },
+  container: { flex: 1, backgroundColor: '#f4f6f9' },
+  barraTopo: {
+    height: 74,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 4,
+    borderBottomColor: '#FF8C00',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    zIndex: 10
+  },
+  botaoToggler: {
+    padding: 8,
+    justifyContent: 'space-around',
+    height: 30,
+    width: 35
+  },
+  hamburgerLinha: {
+    width: 24,
+    height: 3,
+    backgroundColor: '#333',
+    borderRadius: 2
+  },
+  logoTopo: {
+    height: 45,
+    width: 120
+  },
+  mainWrapper: {
+    flex: 1,
+    padding: 16,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  containerTabela: {
+    backgroundColor: '#ffffff',
+    width: '100%',
+    maxWidth: 950,
+    flex: 1,
+    padding: 20,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 5
+  },
+  tituloTabela: {
+    color: '#002A54',
+    textAlign: 'center',
+    fontWeight: '700',
+    fontSize: 16,
+    marginBottom: 20,
+    textTransform: 'uppercase'
+  },
+  produtoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0'
+  },
+  produtoId: { width: '15%', fontWeight: '600', color: '#334155' },
+  produtoFotoContainer: { width: '25%', alignItems: 'center' },
+  btnVisualizar: {
+    borderWidth: 1,
+    borderColor: '#0d6efd',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4
+  },
+  btnVisualizarTexto: { fontSize: 11, color: '#0d6efd', fontWeight: '600' },
+  produtoNome: { width: '45%', color: '#334155', fontSize: 13, paddingHorizontal: 5 },
+  badgeQtd: {
+    width: '15%',
+    backgroundColor: '#f1f5f9',
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    alignItems: 'center'
+  },
+  badgeQtdTexto: { color: '#334155', fontSize: 12, fontWeight: '600' },
   listaVazia: { textAlign: 'center', color: '#999', marginTop: 30, fontSize: 14 },
-  
-  // Estilos do Modal da Imagem
+  offcanvasOverlay: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-start'
+  },
+  offcanvasBackdropTouch: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+  },
+  offcanvasContainer: {
+    width: '75%',
+    maxWidth: 300,
+    backgroundColor: '#ffffff',
+    height: '100%',
+    padding: 20,
+    elevation: 10
+  },
+  offcanvasHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+    paddingBottom: 15,
+    marginBottom: 20
+  },
+  offcanvasTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#334155'
+  },
+  btnClose: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#666'
+  },
+  offcanvasBody: {
+    gap: 10
+  },
+  navItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderRadius: 6
+  },
+  navItemActive: {
+    backgroundColor: '#f1f5f9'
+  },
+  navText: {
+    fontSize: 15,
+    color: '#334155',
+    fontWeight: '500'
+  },
+  navTextActive: {
+    color: '#0d6efd',
+    fontWeight: 'bold'
+  },
   containerModal: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   fundoModal: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.75)' },
   conteudoModal: { width: '90%', maxHeight: '80%', backgroundColor: '#fff', borderRadius: 12, padding: 15, alignItems: 'center', elevation: 10 },
   imagemAmpliada: { width: '100%', height: 300, borderRadius: 8 },
-  botaoFecharModal: { marginTop: 15, backgroundColor: '#192a6b', paddingVertical: 10, paddingHorizontal: 30, borderRadius: 6 },
+  botaoFecharModal: { marginTop: 15, backgroundColor: '#002A54', paddingVertical: 10, paddingHorizontal: 30, borderRadius: 6 },
   textoFecharModal: { color: '#fff', fontWeight: 'bold' }
 });
