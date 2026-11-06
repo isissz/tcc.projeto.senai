@@ -8,7 +8,8 @@ import {
   Alert, 
   ActivityIndicator,
   Dimensions,
-  ScrollView
+  ScrollView,
+  Image // <-- Adicionado o componente Image aqui
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -16,6 +17,9 @@ const { width } = Dimensions.get('window');
 
 // IP do computador + porta publicada pelo Docker + rota da API
 const API_URL = 'http://10.154.20.141:5000/api/login';
+
+// Importando a imagem local usando o require
+const logoSenai = require('./img/senaioficial.png');
 
 export default function Index({ navigation }) {
   const [usuario, setUsuario] = useState('');
@@ -101,6 +105,14 @@ export default function Index({ navigation }) {
         >
           <View style={styles.container}>
             <View style={styles.formCard}>
+              
+              {/* Imagem adicionada aqui com estilo e modo de exibição correto */}
+              <Image 
+                source={logoSenai} 
+                style={styles.logo} 
+                resizeMode="contain" 
+              />
+
               <Text style={styles.titulo}>Entrar</Text>
 
               <TextInput 
@@ -173,6 +185,11 @@ const styles = StyleSheet.create({
   formCard: { 
     alignItems: 'center', 
     width: '100%' 
+  },
+  logo: { // Estilos adicionados para a logo aparecer perfeitamente
+    width: 180,
+    height: 70,
+    marginBottom: 15,
   },
   titulo: { 
     fontSize: 24, 
